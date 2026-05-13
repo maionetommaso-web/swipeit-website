@@ -1,0 +1,806 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SwipeIt — Trova lavoro con uno swipe</title>
+  <meta name="description" content="SwipeIt è l'app italiana per trovare lavoro con un semplice swipe. Offerte personalizzate per ogni settore, dal white collar al blue collar." />
+  <meta property="og:title" content="SwipeIt — Trova lavoro con uno swipe" />
+  <meta property="og:description" content="L'app italiana per trovare lavoro. Scorri le offerte, salva quelle che ti interessano, candidati in un tap." />
+  <meta property="og:image" content="https://swipeit.it/og-image.jpg" />
+  <meta name="theme-color" content="#0d0d0d" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --rust: #c85a2a;
+      --rust-light: #e06b36;
+      --saffron: #d4a017;
+      --bg: #0d0d0d;
+      --bg-card: #161616;
+      --bg-elevated: #1e1e1e;
+      --text: #f0ede8;
+      --text-muted: #8a8580;
+      --border: rgba(255,255,255,0.08);
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 300;
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    /* NAV */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      padding: 20px 40px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: rgba(13,13,13,0.85);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .nav-logo {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 1.3rem;
+      font-weight: 500;
+      color: var(--text);
+      text-decoration: none;
+      letter-spacing: -0.02em;
+    }
+
+    .nav-logo span {
+      font-family: 'Playfair Display', serif;
+      font-style: italic;
+      font-weight: 400;
+      color: var(--rust-light);
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 32px;
+      list-style: none;
+    }
+
+    .nav-links a {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 0.9rem;
+      transition: color 0.2s;
+    }
+
+    .nav-links a:hover { color: var(--text); }
+
+    /* HERO */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      padding: 120px 40px 80px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: -200px; right: -200px;
+      width: 700px; height: 700px;
+      background: radial-gradient(circle, rgba(200,90,42,0.12) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .hero::after {
+      content: '';
+      position: absolute;
+      bottom: -100px; left: -100px;
+      width: 500px; height: 500px;
+      background: radial-gradient(circle, rgba(212,160,23,0.06) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .hero-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      width: 100%;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 80px;
+      align-items: center;
+    }
+
+    .hero-eyebrow {
+      font-size: 0.75rem;
+      font-weight: 500;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--rust-light);
+      margin-bottom: 24px;
+    }
+
+    .hero-title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2.8rem, 5vw, 4.2rem);
+      font-weight: 700;
+      line-height: 1.1;
+      letter-spacing: -0.02em;
+      margin-bottom: 8px;
+    }
+
+    .hero-title em {
+      font-style: italic;
+      font-weight: 400;
+      color: var(--rust-light);
+    }
+
+    .hero-subtitle {
+      font-size: 1.1rem;
+      color: var(--text-muted);
+      margin: 24px 0 40px;
+      max-width: 440px;
+      line-height: 1.7;
+    }
+
+    .hero-actions {
+      display: flex;
+      gap: 16px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: var(--rust);
+      color: white;
+      padding: 16px 28px;
+      border-radius: 50px;
+      text-decoration: none;
+      font-size: 0.95rem;
+      font-weight: 500;
+      transition: background 0.2s, transform 0.2s;
+    }
+
+    .btn-primary:hover {
+      background: var(--rust-light);
+      transform: translateY(-1px);
+    }
+
+    .btn-secondary {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 0.9rem;
+      transition: color 0.2s;
+    }
+
+    .btn-secondary:hover { color: var(--text); }
+
+    /* PHONE MOCKUP */
+    .hero-visual {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+    }
+
+    .phone-frame {
+      width: 260px;
+      height: 520px;
+      background: var(--bg-card);
+      border-radius: 44px;
+      border: 1.5px solid rgba(255,255,255,0.12);
+      overflow: hidden;
+      position: relative;
+      box-shadow: 0 40px 80px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.04);
+    }
+
+    .phone-screen {
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(160deg, #161616 0%, #111 100%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      gap: 12px;
+    }
+
+    .mock-card {
+      width: 100%;
+      background: #1e1e1e;
+      border-radius: 20px;
+      padding: 20px;
+      border: 1px solid rgba(255,255,255,0.06);
+    }
+
+    .mock-card-tag {
+      font-size: 0.6rem;
+      font-weight: 500;
+      letter-spacing: 0.1em;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+
+    .mock-card-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 4px;
+    }
+
+    .mock-card-company {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    .mock-card-badge {
+      display: inline-block;
+      margin-top: 10px;
+      padding: 4px 10px;
+      border-radius: 20px;
+      background: rgba(200,90,42,0.15);
+      color: var(--rust-light);
+      font-size: 0.65rem;
+      font-weight: 500;
+    }
+
+    .mock-swipe-hint {
+      display: flex;
+      gap: 24px;
+      margin-top: 8px;
+    }
+
+    .mock-btn {
+      flex: 1;
+      height: 44px;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+    }
+
+    .mock-btn-no { background: rgba(239,68,68,0.1); }
+    .mock-btn-yes { background: rgba(34,197,94,0.1); }
+
+    .phone-notch {
+      position: absolute;
+      top: 12px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 80px;
+      height: 28px;
+      background: #0d0d0d;
+      border-radius: 20px;
+      z-index: 10;
+    }
+
+    /* FEATURES */
+    .features {
+      padding: 100px 40px;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .section-label {
+      font-size: 0.75rem;
+      font-weight: 500;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--rust-light);
+      margin-bottom: 16px;
+    }
+
+    .section-title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(1.8rem, 3vw, 2.6rem);
+      font-weight: 700;
+      line-height: 1.2;
+      margin-bottom: 60px;
+    }
+
+    .section-title em {
+      font-style: italic;
+      font-weight: 400;
+      color: var(--rust-light);
+    }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+    }
+
+    .feature-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 32px;
+      transition: border-color 0.3s, transform 0.3s;
+    }
+
+    .feature-card:hover {
+      border-color: rgba(200,90,42,0.3);
+      transform: translateY(-4px);
+    }
+
+    .feature-icon {
+      font-size: 2rem;
+      margin-bottom: 20px;
+    }
+
+    .feature-title {
+      font-weight: 500;
+      font-size: 1.05rem;
+      margin-bottom: 10px;
+      color: var(--text);
+    }
+
+    .feature-desc {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      line-height: 1.65;
+    }
+
+    /* HOW IT WORKS */
+    .how {
+      padding: 100px 40px;
+      background: var(--bg-card);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .how-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .steps {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 40px;
+      margin-top: 60px;
+    }
+
+    .step {
+      position: relative;
+    }
+
+    .step-number {
+      font-family: 'Playfair Display', serif;
+      font-size: 3rem;
+      font-weight: 700;
+      color: rgba(200,90,42,0.2);
+      line-height: 1;
+      margin-bottom: 16px;
+    }
+
+    .step-title {
+      font-weight: 500;
+      margin-bottom: 8px;
+    }
+
+    .step-desc {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      line-height: 1.6;
+    }
+
+    /* SECTORS */
+    .sectors {
+      padding: 100px 40px;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .sector-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 40px;
+    }
+
+    .sector-tag {
+      padding: 10px 20px;
+      border-radius: 50px;
+      border: 1px solid var(--border);
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      background: var(--bg-card);
+      transition: all 0.2s;
+    }
+
+    .sector-tag:hover, .sector-tag.active {
+      border-color: var(--rust);
+      color: var(--rust-light);
+      background: rgba(200,90,42,0.08);
+    }
+
+    /* CTA */
+    .cta {
+      padding: 120px 40px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .cta::before {
+      content: '';
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      width: 600px; height: 600px;
+      background: radial-gradient(circle, rgba(200,90,42,0.1) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .cta-title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2rem, 4vw, 3.2rem);
+      font-weight: 700;
+      line-height: 1.2;
+      margin-bottom: 20px;
+      position: relative;
+    }
+
+    .cta-title em {
+      font-style: italic;
+      font-weight: 400;
+      color: var(--rust-light);
+    }
+
+    .cta-sub {
+      font-size: 1rem;
+      color: var(--text-muted);
+      margin-bottom: 40px;
+      position: relative;
+    }
+
+    .cta-buttons {
+      display: flex;
+      gap: 16px;
+      justify-content: center;
+      flex-wrap: wrap;
+      position: relative;
+    }
+
+    .app-store-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      background: var(--text);
+      color: var(--bg);
+      padding: 14px 24px;
+      border-radius: 14px;
+      text-decoration: none;
+      transition: opacity 0.2s, transform 0.2s;
+    }
+
+    .app-store-badge:hover {
+      opacity: 0.9;
+      transform: translateY(-2px);
+    }
+
+    .app-store-badge svg {
+      width: 24px;
+      height: 24px;
+    }
+
+    .app-store-text {
+      display: flex;
+      flex-direction: column;
+      text-align: left;
+    }
+
+    .app-store-text small {
+      font-size: 0.65rem;
+      font-weight: 400;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      opacity: 0.6;
+    }
+
+    .app-store-text strong {
+      font-size: 1rem;
+      font-weight: 600;
+    }
+
+    /* FOOTER */
+    footer {
+      padding: 40px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+
+    .footer-logo {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 1.1rem;
+      font-weight: 500;
+      color: var(--text);
+      text-decoration: none;
+    }
+
+    .footer-logo span {
+      font-family: 'Playfair Display', serif;
+      font-style: italic;
+      color: var(--rust-light);
+    }
+
+    .footer-links {
+      display: flex;
+      gap: 24px;
+      list-style: none;
+    }
+
+    .footer-links a {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 0.85rem;
+      transition: color 0.2s;
+    }
+
+    .footer-links a:hover { color: var(--text); }
+
+    .footer-copy {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    /* ANIMATIONS */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(24px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .hero-eyebrow { animation: fadeUp 0.6s ease both; }
+    .hero-title { animation: fadeUp 0.6s 0.1s ease both; }
+    .hero-subtitle { animation: fadeUp 0.6s 0.2s ease both; }
+    .hero-actions { animation: fadeUp 0.6s 0.3s ease both; }
+    .hero-visual { animation: fadeUp 0.8s 0.2s ease both; }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-10px); }
+    }
+
+    .phone-frame { animation: float 6s ease-in-out infinite; }
+
+    /* RESPONSIVE */
+    @media (max-width: 768px) {
+      nav { padding: 16px 20px; }
+      .nav-links { display: none; }
+
+      .hero { padding: 100px 20px 60px; }
+      .hero-inner {
+        grid-template-columns: 1fr;
+        gap: 48px;
+        text-align: center;
+      }
+
+      .hero-subtitle { margin: 20px auto 32px; }
+      .hero-actions { justify-content: center; }
+      .hero-visual { order: -1; }
+      .phone-frame { width: 220px; height: 440px; }
+
+      .features { padding: 60px 20px; }
+      .features-grid { grid-template-columns: 1fr; }
+
+      .how { padding: 60px 20px; }
+      .steps { grid-template-columns: 1fr 1fr; gap: 32px; }
+
+      .sectors { padding: 60px 20px; }
+      .cta { padding: 80px 20px; }
+
+      footer {
+        padding: 30px 20px;
+        flex-direction: column;
+        text-align: center;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav>
+    <a href="/" class="nav-logo">Swipe<span>It</span></a>
+    <ul class="nav-links">
+      <li><a href="#come-funziona">Come funziona</a></li>
+      <li><a href="#settori">Settori</a></li>
+      <li><a href="privacy.html">Privacy</a></li>
+      <li><a href="supporto.html">Supporto</a></li>
+    </ul>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-inner">
+      <div>
+        <p class="hero-eyebrow">Disponibile su iOS · Roma &amp; Italia</p>
+        <h1 class="hero-title">
+          Trova lavoro<br>con uno <em>swipe</em>
+        </h1>
+        <p class="hero-subtitle">
+          SwipeIt ti porta le offerte di lavoro più adatte a te — dal ristorante sotto casa alla multinazionale. Scorri, salva, candidati. Semplice.
+        </p>
+        <div class="hero-actions">
+          <a href="#download" class="btn-primary">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
+            Scarica su App Store
+          </a>
+          <a href="#come-funziona" class="btn-secondary">
+            Scopri come funziona →
+          </a>
+        </div>
+      </div>
+
+      <div class="hero-visual">
+        <div class="phone-frame">
+          <div class="phone-notch"></div>
+          <div class="phone-screen">
+            <div class="mock-card">
+              <p class="mock-card-tag">Roma · In presenza</p>
+              <p class="mock-card-title">Idraulico</p>
+              <p class="mock-card-company">Homeplace Group</p>
+              <span class="mock-card-badge">✦ Top match</span>
+            </div>
+            <div class="mock-card" style="opacity:0.5; transform: scale(0.95);">
+              <p class="mock-card-tag">Roma · Ibrido</p>
+              <p class="mock-card-title">HR Manager</p>
+              <p class="mock-card-company">Leonardo SpA</p>
+            </div>
+            <div class="mock-swipe-hint">
+              <div class="mock-btn mock-btn-no">✕</div>
+              <div class="mock-btn mock-btn-yes">♡</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FEATURES -->
+  <section class="features">
+    <p class="section-label">Perché SwipeIt</p>
+    <h2 class="section-title">Tutto quello che ti serve<br>per trovare il lavoro <em>giusto</em></h2>
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon">🎯</div>
+        <h3 class="feature-title">Match personalizzati</h3>
+        <p class="feature-desc">L'intelligenza artificiale analizza il tuo profilo e il tuo CV per mostrarti solo le offerte davvero pertinenti.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">⚡</div>
+        <h3 class="feature-title">Aggiornato ogni giorno</h3>
+        <p class="feature-desc">Raccogliamo offerte da LinkedIn, Indeed e aziende locali italiane ogni giorno. Sempre nuove opportunità.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">✍️</div>
+        <h3 class="feature-title">Lettera di presentazione AI</h3>
+        <p class="feature-desc">Genera una lettera personalizzata per ogni offerta in pochi secondi, pronta da inviare.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🍕</div>
+        <h3 class="feature-title">Dal bar alla banca</h3>
+        <p class="feature-desc">Che tu cerchi lavoro come cameriere, idraulico, HR manager o sviluppatore — SwipeIt copre tutti i settori.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">📍</div>
+        <h3 class="feature-title">Locale e nazionale</h3>
+        <p class="feature-desc">Offerte nella tua città, con la possibilità di cercare in tutta Italia o filtrare per modalità remota.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🔒</div>
+        <h3 class="feature-title">Privacy prima di tutto</h3>
+        <p class="feature-desc">I tuoi dati sono protetti e non vengono mai venduti a terzi. Conforme GDPR.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- HOW IT WORKS -->
+  <section class="how" id="come-funziona">
+    <div class="how-inner">
+      <p class="section-label">Come funziona</p>
+      <h2 class="section-title">Trovare lavoro non è mai stato<br>così <em>semplice</em></h2>
+      <div class="steps">
+        <div class="step">
+          <div class="step-number">01</div>
+          <h3 class="step-title">Crea il tuo profilo</h3>
+          <p class="step-desc">Registrati e carica il tuo CV oppure inserisci manualmente le tue preferenze lavorative.</p>
+        </div>
+        <div class="step">
+          <div class="step-number">02</div>
+          <h3 class="step-title">Scegli il settore</h3>
+          <p class="step-desc">Indica il tipo di lavoro che cerchi — ristorazione, edilizia, ufficio, tech. Tutto è possibile.</p>
+        </div>
+        <div class="step">
+          <div class="step-number">03</div>
+          <h3 class="step-title">Scorri le offerte</h3>
+          <p class="step-desc">Swipe a destra per salvare, swipe a sinistra per scartare. In pochi minuti hai già una lista di offerte interessanti.</p>
+        </div>
+        <div class="step">
+          <div class="step-number">04</div>
+          <h3 class="step-title">Candidati subito</h3>
+          <p class="step-desc">Genera la tua lettera di presentazione con AI e candidati direttamente dal tuo telefono.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTORS -->
+  <section class="sectors" id="settori">
+    <p class="section-label">Settori</p>
+    <h2 class="section-title">Per ogni tipo di <em>lavoro</em></h2>
+    <div class="sector-tags">
+      <span class="sector-tag active">Ristorazione</span>
+      <span class="sector-tag">Edilizia</span>
+      <span class="sector-tag">Informatica</span>
+      <span class="sector-tag">HR &amp; Recruiting</span>
+      <span class="sector-tag">Marketing</span>
+      <span class="sector-tag">Finanza</span>
+      <span class="sector-tag">Sanità</span>
+      <span class="sector-tag">Moda</span>
+      <span class="sector-tag">Commercio</span>
+      <span class="sector-tag">Logistica</span>
+      <span class="sector-tag">Educazione</span>
+      <span class="sector-tag">Parrucchieri &amp; Estetica</span>
+      <span class="sector-tag">Idraulica</span>
+      <span class="sector-tag">Elettricisti</span>
+      <span class="sector-tag">Vendite</span>
+      <span class="sector-tag">Amministrazione</span>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta" id="download">
+    <h2 class="cta-title">Il tuo prossimo lavoro<br>è a uno <em>swipe</em> di distanza</h2>
+    <p class="cta-sub">Gratuito. Nessuna registrazione lunga. Inizia in 2 minuti.</p>
+    <div class="cta-buttons">
+      <a href="#" class="app-store-badge">
+        <svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+          <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/>
+        </svg>
+        <div class="app-store-text">
+          <small>Scarica su</small>
+          <strong>App Store</strong>
+        </div>
+      </a>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <a href="/" class="footer-logo">Swipe<span>It</span></a>
+    <ul class="footer-links">
+      <li><a href="privacy.html">Privacy Policy</a></li>
+      <li><a href="termini.html">Termini di Servizio</a></li>
+      <li><a href="supporto.html">Supporto</a></li>
+    </ul>
+    <p class="footer-copy">© 2026 SwipeIt. Tutti i diritti riservati.</p>
+  </footer>
+
+</body>
+</html>
