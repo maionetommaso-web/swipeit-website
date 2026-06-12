@@ -1,21 +1,78 @@
 <!DOCTYPE html>
-<html>
+<html lang="it">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>JobMatch — Reimposta password</title>
-  <script>
-    window.onload = function() {
-      var params = new URLSearchParams(window.location.search);
-      var code = params.get("code");
-      if (code) {
-        window.location.href = "jobmatch://reset-password?code=" + encodeURIComponent(code);
-      } else {
-        document.getElementById("msg").textContent = "Link non valido — codice mancante.";
-      }
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif;
+      background: #E2DACB;
+      color: #1C1C1E;
+      min-height: 100dvh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
     }
-  </script>
+    .card {
+      text-align: center;
+      max-width: 360px;
+      width: 100%;
+    }
+    .logo {
+      font-size: 32px;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+      margin-bottom: 8px;
+    }
+    .logo span { color: #FF7A1A; }
+    .subtitle {
+      font-size: 17px;
+      color: #6B6B72;
+      margin-bottom: 40px;
+    }
+    .cta {
+      display: block;
+      width: 100%;
+      padding: 16px;
+      background: #FF7A1A;
+      color: #fff;
+      font-size: 18px;
+      font-weight: 600;
+      text-decoration: none;
+      border-radius: 980px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+      transition: background 0.15s;
+    }
+    .cta:active { background: #e06b10; }
+    .error {
+      font-size: 17px;
+      color: #E5484D;
+    }
+  </style>
 </head>
 <body>
-  <p id="msg">Apertura JobMatch...</p>
+  <div class="card">
+    <p class="logo">Job<span>Match</span></p>
+    <p id="subtitle" class="subtitle">Tocca il pulsante per reimpostare la password</p>
+    <a id="cta" class="cta" style="display:none">Apri JobMatch</a>
+    <p id="error" class="error" style="display:none"></p>
+  </div>
+  <script>
+    var params = new URLSearchParams(window.location.search);
+    var code = params.get("code");
+    if (code) {
+      var link = document.getElementById("cta");
+      link.href = "jobmatch://reset-password?code=" + encodeURIComponent(code);
+      link.style.display = "block";
+    } else {
+      document.getElementById("subtitle").style.display = "none";
+      var err = document.getElementById("error");
+      err.textContent = "Link non valido \u2014 codice mancante.";
+      err.style.display = "block";
+    }
+  </script>
 </body>
 </html>
