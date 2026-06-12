@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>JobMatch — Reimposta password</title>
+  <script>
+    window.onload = function() {
+      var params = new URLSearchParams(window.location.search);
+      var code = params.get("code");
+      if (code) {
+        window.location.href = "jobmatch://reset-password?code=" + encodeURIComponent(code);
+      } else {
+        document.getElementById("msg").textContent = "Link non valido — codice mancante.";
+      }
+    }
+  </script>
+</head>
+<body>
+  <p id="msg">Apertura JobMatch...</p>
+</body>
+</html>
